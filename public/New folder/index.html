@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" id="body">
+<head >
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,600,700" rel="stylesheet">
+    <link rel="shortcut icon"  href="css/img/ic_blood.png">
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-firestore.js"></script>
+    <link rel="stylesheet" href="css/style.css"/>
+    <title>ActoCare</title>
+</head>
+<body >
+    <div class="container">
+        <div class="header">
+            <header class="header__main">
+                <h2 class="logo-box">
+                    <img src="css/img/logo.svg" alt="Logo" class="header__logo">
+                    <span class= "header-img-heading-1">Acto</span><span style="font-size:2.1rem;">care</span>
+                </h2>
+                <a class="btn header__btn" style="display: none;" onclick="logout()">
+                    <img src="css/img/logout.png" class="logout-button" alt="logout-button"><span class="logout-text">Logout</span></a>
+            </header>
+        </div>
+        <div class="main-display" id="primary" style="display: none;">
+            <div class="main-display__heading">
+                <div>
+                    <div class="main-display__text-main" id="HosName"></div>
+                </div>
+            </div>
+            <div class="main-display__content" style="display: none;">
+                <div class="Request">
+                    <div class="box__headings" >
+                        <div class="heading">Incoming Requests</div>
+                    </div>
+                    <ul class="request__list">
+                    </ul>
+                    <div class="page-buttons">
+                        <button id="result_prev-btn" class="btn-inline results__btn--prev">
+                            <span>prev</span>
+                        </button>
+                        <button id="result_next-btn" class="btn-inline results__btn--next">
+                            <span>next</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="Details">
+                    <div class="details__wall">
+
+                        <div class="details__wall-heading">
+                            <h2 id="details-msg">Click on any Request/Response to view details.</h2>
+                        </div>
+                        <img class="details__wall-img" src="css/img/main.svg">
+                    </div>
+                    <div class="details-item" style="display: none;">
+                        <div class="container-info">
+                            <div class="item-info row">
+                                <div class="item-info__head col-1-of-2">Patient Name</div>
+                                <div id = "DetailName" class="item-info__data col-1-of-2"></div>
+                            </div>
+                            <div class="item-info row">
+                                <div class="item-info__head col-1-of-2">Request Type</div>
+                                <div id = "DetailType" class="item-info__data col-1-of-2"></div>
+                            </div>
+                            <div class="item-info row">
+                                <div class="item-info__head col-1-of-2">Request Status</div>
+                                <div id = "DetailStatus" class="item-info__data col-1-of-2"></div>
+                            </div>
+                            <div class="item-info row">
+                                <div class="item-info__head col-1-of-2">Request Time</div>
+                                <div id = "DetailRTime" class="item-info__data col-1-of-2"></div>
+                            </div>
+                            <div id = "Detail_AcceptTime"  style="margin-bottom: 1rem;display: none;"  >
+                                <div class="item-info row">
+                                    <div class="item-info__head col-1-of-2">Acceptance Time</div>
+                                    <div id = "DetailATime" class="item-info__data col-1-of-2"></div>
+                                </div>
+                            </div>
+                            <div id="div_location" class="item-info row">
+                                <div class="item-info__head col-1-of-2">Location</div>
+                                <div id = "DetailLocation" class="item-info__data col-1-of-2"></div>
+                            </div>
+                        </div>
+                        <div id = "button-container" style="display: flex;flex-direction: column;align-items: center;">
+                            <div class="btn btn-btm btn-btm-submit accept-button" onclick="signup()">
+                                Accept 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="Accepted">
+                    <div class="box__headings" >
+                        <div class="heading">Accepted Requests</div>
+                    </div>
+                    <ul class="accepted__list">
+                    </ul>
+                    <div class="page-buttons">
+                        <button id="response_prev-btn" class="btn-inline results__btn--prev">
+                            <span>prev</span>
+                        </button>
+                        <button id="response_next-btn" class="btn-inline results__btn--next">
+                            <span>next</span>
+                        </button>
+                    </div>
+                </div>
+            </div>  
+        </div>
+        <div class="main-forms" id="secondary">
+            <div class="main-forms__panel1">
+                <div class="main-forms__heading">
+                    <h1 class="heading">ActoCare</h1>
+                    <p>Because we care.</p>
+                </div>
+                <div class="main-forms__image">
+                    <img src="css/img/login.svg">
+                </div>
+            </div>
+            <div class="main-forms__panel2" id="signUP" >
+                <div class="form-display">
+                    <div class="signup-form form" method="POST">
+                        <div class="from-btm-title">
+                            <h3 class="form-btm-h1">
+                            Create Account
+                            </h3>
+                        </div>
+                        <div id="error-signup" style="display: none"></div>
+                        <div class="input-group">
+                            <input
+                                class="input input-btm"
+                                type="text"
+                                id="hos_name"
+                                name=""
+                                placeholder="Name"
+                                required
+                            />
+                            <div class="input-phr">Name</div>
+                            <div class="input-fix">Fix</div>
+                            <div class="input-audit"></div>
+                            <div class="input-aux">Write Name of Hospital</div>
+                        </div>
+                        <div class="input-group">
+                            <input
+                                class="input input-btm"
+                                type="text"
+                                pattern=".{13}"
+                                name=""
+                                id="Registration_ID"
+                                placeholder="Registration ID"
+                                required
+                            />
+                            <div class="input-phr">Registration Number</div>
+                            <div class="input-fix">Fix</div>
+                            <div class="input-audit"></div>
+                            <div class="input-aux">Registration Number must be 13 characters</div>
+                        </div>
+                        <div class="input-group">
+                            <input
+                                class="input input-btm"
+                                type="text"
+                                pattern=".{11}"
+                                name=""
+                                id="Contact_No"
+                                placeholder="Contact No"
+                                required
+                            />
+                            <div class="input-phr">Contact No</div>
+                            <div class="input-fix">Fix</div>
+                            <div class="input-audit"></div>
+                            <div class="input-aux">Contact Number must be at 11 characters</div>
+                        </div>
+                        <div class="input-group">
+                            <input
+                                class="input input-btm"
+                                type="email"
+                                minlength="6"
+                                id="signup-email"
+                                name=""
+                                placeholder="Email"
+                                required
+                            />
+                            <div class="input-phr">Email Address</div>
+                            <div class="input-fix">Fix</div>
+                            <div class="input-audit"></div>
+                            <div class="input-aux">
+                                Write a valid email address with an '@' and a '.'
+                            </div>
+                        </div>
+                        <div class="inner-flex">
+                            <div class="input-group">
+                            <input
+                                class="input input-btm"
+                                type="Password"
+                                pattern=".{6,}"
+                                id="signup-password"
+                                name=""
+                                placeholder="New Password"
+                                required
+                            />
+                            <div class="input-phr">Password</div>
+                            <div class="input-fix">Fix</div>
+                            <div class="input-audit"></div>
+                            <div class="input-aux">Password must be at least six characters</div>
+                            </div>
+                            <div class="input-group">
+                                <input
+                                    class="input input-btm"
+                                    type="Password"
+                                    minlength="6"
+                                    name=""
+                                    id="signup-secpassword"
+                                    placeholder="Re-Enter Password"
+                                    required
+                                />
+                                <div class="input-phr">Re-Enter Password</div>
+                                <div class="input-fix">Fix</div>
+                                <div class="input-audit"></div>
+                                <div class="input-aux">Re-write your password to confirm</div>
+                            </div>
+                        </div>
+                        <div class="submit-btm">
+                            <button
+                                class="btn btn-btm btn-btm-submit"
+                                id="signup-button"
+                                onclick="signup()"
+                                type="submit"
+                                name=""
+                                required
+                            >
+                            Create Account
+                            </button>
+                        </div>
+                        <p class="form-btm-text" onclick="hide(0)">
+                        Already have an account?&nbsp;<a class="form-btm-link">Sign in</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="main-forms__panel3" id="signIN">
+                <div class="form-display">
+                    <div class="signin-form form">
+                        <div class="from-btm-title">
+                            <h3 class="form-btm-h1">
+                            Login to Account
+                            </h3>
+                        </div>
+                        <div id="error-login" style="display: none"></div>
+                        <div class="input-group">
+                        <input
+                            class="input input-btm"
+                            type="email"
+                            id="login-email"
+                            minlength="6"
+                            name="email"
+                            placeholder="Email"
+                            required
+                        />
+                        <div class="input-phr">Email Address</div>
+                        <div class="input-fix">Fix</div>
+                        <div class="input-audit"></div>
+                        <div class="input-aux">
+                            Write a valid email address with an '@' and a '.'
+                        </div>
+                        </div>
+                        <div class="input-group">
+                        <input
+                            class="input input-btm"
+                            id="login-password"
+                            type="Password"
+                            pattern=".{6,}"
+                            name="password"
+                            placeholder="Password"
+                            required
+                        />
+                        <div class="input-phr">Password</div>
+                        <div class="input-fix">Fix</div>
+                        <div class="input-audit"></div>
+                        <div class="input-aux">Password must be at least six characters</div>
+                        </div>
+                        <div class="submit-btm">
+                            <button
+                                class="btn btn-btm btn-btm-submit"
+                                type="submit"
+                                name=""
+                                id="login-button"
+                                placeholder="dummy"
+                                onclick="login()"
+                                required
+                            >
+                            Login
+                            </button>
+                        </div>
+                    
+                        <p class="form-btm-text" onclick="hide(1)">
+                            Do have an account?&nbsp;<a class="form-btm-link">Sign up</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            const firebaseConfig = {
+                apiKey: "AIzaSyDhWmnV6dZw_EANTMNGGsPWvU2m9OTExdA",
+                authDomain: "actocare.firebaseapp.com",
+                databaseURL: "https://actocare-f8502.firebaseio.com",
+                projectId: "actocare",
+                storageBucket: "actocare.appspot.com"
+            };
+            var firebaseApp = firebase.initializeApp(firebaseConfig);
+            var db = firebaseApp.firestore();
+        </script>
+        <script src="js/index.js"></script>
+    </div>
+</body>
+</html>
